@@ -1,0 +1,27 @@
+
+uvicorn==0.22.0
+fastapi==0.100.0
+requests==2.32.3
+
+# # Web 框架相关
+# fastapi==0.115.12
+# uvicorn==0.34.3
+# requests==2.31.0
+
+# # 数据处理
+# numpy==2.2.6
+# pandas==2.3.0
+# pydantic==2.11.5
+# scikit-learn==1.7.0
+
+# # 股票数据
+# yfinance==0.2.61
+# ccxt==4.4.88
+# alpaca-trade-api==3.2.0
+# tushare==1.4.21
+# akshare==1.16.98
+
+# # AI 
+# openai==1.55.3
+
+# pyjwt==2.10.1
