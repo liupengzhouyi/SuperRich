@@ -1,0 +1,93 @@
+{
+    "name": "Super Rich Stock Risk Analysis Machine",
+    "version": "1.0.0",
+    "description": "Configuration for Super Rich Stock Risk Analysis Machine",
+    "author": "Peng Liu",
+    "data_source": {
+        "frist_data_drive_main": "数据优先级,首先考虑哪里的数据源",
+        "frist_data_drive": "data_cache",
+        "data_source_type_main": "数据来源",
+        "data_source_type" : ["data_driver", "data_cache"],
+        "data_driver_main": "数据驱动",
+        "data_driver": "alpha_vantage",
+        "data_drivers_main": "数据驱动可选项",
+        "data_drivers": ["alpha_vantage", "yahoo_finance"],
+        "alpha_vantage_api_key_info": {
+            "api_key": "",
+            "api_keys": [
+                ""
+            ],
+            "api_key_file": "config/alpha_vantage_api_keys.json"
+        },
+        "yahoo_finance": {
+            "dummy": ""
+        },
+        "data_cache": {
+            "enabled": true,
+            "cache_dir": "data_cache",
+            "file_name_style": "{ticker}_{start_date}_{end_date}.csv",
+            "expiration_days": 7
+        },
+        "years": 5
+    },
+    "data_driven_configeration": {
+        "yahoo_finance": {
+            "api_key": "sk-",
+            "base_url": "https://query1.finance.yahoo.com/v10/finance/quoteSummary/",
+            "timeout": 10,
+            "retry_attempts": 3
+        },
+        "Alpha Vantage": {
+            "api_key": "sk-",
+            "base_url": "https://www.alphavantage.co/query",
+            "timeout": 10,
+            "retry_attempts": 3
+        }
+    },
+    "gtp_api_configeration": {
+        "openai": {
+            "api_key": "sk-",
+            "model": "gpt-3.5-turbo",
+            "temperature": 0.7,
+            "max_tokens": 1000
+        },
+        "gemini": {
+            "api_key": "sk-",
+            "model": "gemini-1.5-flash",
+            "temperature": 0.7,
+            "max_tokens": 1000
+        },
+        "deepseek": {
+            "api_key": "sk-",
+            "model": "deepseek-chat-2.0",
+            "temperature": 0.7,
+            "max_tokens": 1000
+        }
+    },
+    "stock_data_configeration": {
+    },
+    "Account Management": {},
+    "Reporter": {
+        "report_template": "report_template.md",
+        "output_directory": "reports",
+        "default_report_format": "markdown"
+    },
+    "Reporter Absutct": {
+        "1.0.0": {
+            "": ""
+        },
+        "2.0.0": {
+            "": ""
+        }
+    },
+    "logging": {
+        "level": "INFO",
+        "format_old": "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+        "format": "[%(asctime)s] [%(levelname)s] [%(filename)s:%(lineno)d - %(funcName)s] %(message)s",
+        "datefmt": "%Y-%m-%d %H:%M:%S",
+        "enable_console": true,
+        "enable_file": true,
+        "file_path": "logs/superrich.log"
+    }
+
+}

@@ -1,0 +1,13 @@
+{
+    "Alpha Vantage Helper Text": "You need to register anaccount at https://www.alphavantage.co/support/#api-key toget your API key.",
+    "Alpha Vantage": [
+        {
+            "E-mail": "",
+            "ALPHA_VANTAGE_API_KEY": ""
+        },
+        {
+            "E-mail": "",
+            "ALPHA_VANTAGE_API_KEY": ""
+        }
+    ]
+}
