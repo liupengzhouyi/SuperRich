@@ -13,11 +13,8 @@
         "data_drivers_main": "数据驱动可选项",
         "data_drivers": ["alpha_vantage", "yahoo_finance"],
         "alpha_vantage_api_key_info": {
-            "api_key": "",
-            "api_keys": [
-                ""
-            ],
-            "api_key_file": "config/alpha_vantage_api_keys.json"
+            "api_key_file_path_main": "API Key 文件路径",
+            "api_key_file_path": "config/alpha_vantage_api_keys.json"
         },
         "yahoo_finance": {
             "dummy": ""

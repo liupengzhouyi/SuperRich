@@ -2,6 +2,8 @@
 # -*- coding: utf-8 -*-
 
 import json
+import pandas as pd
+
 from utils.logger_manager import init_logger_from_file
 from utils.logger_manager import init_logger_from_dict
 from utils.logger_manager import get_logger
@@ -29,7 +31,16 @@ from data_fetchers.data_factory import DataFactory
 data_factory = DataFactory(config=my_config)
 data_factory.info()
 
-data_factory.GET_STOCK_DATA("AAPL", "2020-01-01", "2025-01-01")
+STOCK_CODE = "NVDA"
+stock_data = data_factory.GET_STOCK_DATA(STOCK_CODE, "2024-01-01", "2025-01-01")
 
+print(type(stock_data))
+print(stock_data.head())
+print(stock_data.tail())
+
+# print(stock_data.describe())
 # 生成一个缓存路径
 # print(data_factory._cache_file_path("TSLA", "2020-01-01", "2025-01-01"))
+
+from views.base_stock_visualizer import visualize_stock_candlestick
+visualize_stock_candlestick(stock_data, title=STOCK_CODE, save_path="output/HOOD_candlestick.png")

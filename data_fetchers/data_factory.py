@@ -30,6 +30,7 @@ class DataFactory:
         self.data_drivers = self.config.get("data_drivers", [])
         self.first_data_drive = self.config.get("frist_data_drive", "data_cache")
         self.years = self.config.get("years", 5)
+        self.alpha_vantage_api_keys = self.get_alpha_vantage_api_keys()
 
         logger.info("DataFactory 初始化完成")
 
@@ -173,8 +174,43 @@ class DataFactory:
             except Exception as e:
                 logger.error(f"{str(index)}. 解析缓存文件名时出错: {e}")
         return check_status
-        
-    def GET_STOCK_DATA(self, STOCK_CODE: str, START_DATE: str, END_DATE: str):
+    
+    def get_alpha_vantage_api_keys(self) -> list:
+        """获取 Alpha Vantage API Key 列表
+
+        Returns:
+            list: API Key 列表
+        """
+        api_key_info = self.config.get("alpha_vantage_api_key_info", {})
+        api_keys = []
+        api_key_file_path = api_key_info.get("api_key_file_path", "")
+        if api_key_file_path and os.path.exists(api_key_file_path):
+            try:
+                with open(api_key_file_path, "r") as f:
+                    data = json.load(f)
+                    if isinstance(data, dict) and "Alpha Vantage" in data.keys():
+                        utrus_api_keys = data.get("Alpha Vantage", [])
+                        for item in utrus_api_keys:
+                            if isinstance(item, dict) and "ALPHA_VANTAGE_API_KEY" in item.keys():
+                                key = item.get("ALPHA_VANTAGE_API_KEY", "")
+                                if key and key not in api_keys:
+                                    api_keys.append(key)
+                    elif isinstance(data, list):
+                        api_keys = data
+                logger.info(f"从文件 {api_key_file_path} 读取到 {len(api_keys)} 个 API Key")
+            except Exception as e:
+                logger.error(f"读取 API Key 文件时出错: {e}")
+        else:
+            single_api_key = api_key_info.get("api_key", "")
+            if single_api_key:
+                api_keys.append(single_api_key)
+                logger.info("从配置中读取到单个 API Key")
+            else:
+                logger.warning("未配置任何 Alpha Vantage API Key")
+        return api_keys
+    
+    
+    def GET_STOCK_DATA(self, STOCK_CODE: str, START_DATE: str, END_DATE: str) -> pd.DataFrame:
         
         logger.info(f"请求股票数据: {STOCK_CODE}, 从 {START_DATE} 到 {END_DATE}")
         logger.info(f"先检查数据优先级: {self.first_data_drive}")
@@ -213,7 +249,21 @@ class DataFactory:
         log_info = f"从缓存获取 {STOCK_CODE} 在 {START_DATE} 到 {END_DATE} 之间的数据"
         logger.info(log_info)
         
-        pass
+        cache_file_path = self._cache_file_path(STOCK_CODE, START_DATE, END_DATE)
+        cache_file_path = "data_cache/AAPL_1999-11-01_2025-08-28.csv"
+        if not os.path.exists(cache_file_path):
+            logger.error(f"缓存文件不存在: {cache_file_path}")
+            return pd.DataFrame()
+        try:
+            df = pd.read_csv(cache_file_path)
+            if df.empty:
+                logger.warning(f"缓存文件为空: {cache_file_path}")
+                return pd.DataFrame()
+            logger.info(f"成功从缓存文件读取数据: {cache_file_path}, 共 {len(df)} 行")
+            return df
+        except Exception as e:
+            logger.error(f"读取缓存文件时出错: {e}")
+            return pd.DataFrame()
     
     def GET_STOCK_DATA_FROM_alpha_vantage(self, STOCK_CODE: str, START_DATE: str, END_DATE: str) -> pd.DataFrame:
         """获取指定股票在指定日期范围内的历史数据 by Alpha Vantage
@@ -230,20 +280,25 @@ class DataFactory:
         log_info = f"从 Alpha Vantage 获取 {STOCK_CODE} 在 {START_DATE} 到 {END_DATE} 之间的数据"
         logger.info(log_info)
         
-        # alpha_vantage_api_key_info = self.config.get("alpha_vantage_api_key_info", {})
-        # api_key = alpha_vantage_api_key_info.get("api_key", "")
-        # api_keys = alpha_vantage_api_key_info.get("api_keys", [])
-        # alpha_vantage_fetcher = AlphaVantageFetcher(api_key=api_key)
-        # stock_data = alpha_vantage_fetcher.GET_FULL_STOCK_DATA(STOCK_CODE)
-        
-        # need_save = True
-        # if need_save:
-        #     save_status = alpha_vantage_fetcher.save(STOCK_CODE, stock_data)
-        #     if save_status:
-        #         logger.info(f"数据保存成功")
-        #     else:
-        #         logger.warning(f"数据保存失败")
-        # return stock_data
+        for api_key in self.alpha_vantage_api_keys:
+            if not api_key:
+                continue
+            logger.info(f"使用 Alpha Vantage API Key: {api_key[-6:]} 获取数据")
+            try:
+                alpha_vantage_fetcher = AlphaVantageFetcher(api_key=api_key)
+                stock_data = alpha_vantage_fetcher.GET_FULL_STOCK_DATA(STOCK_CODE)
+                need_save = True
+                if need_save:
+                    save_status = alpha_vantage_fetcher.save(STOCK_CODE, stock_data)
+                    if save_status:
+                        logger.info(f"数据保存成功")
+                    else:
+                        logger.warning(f"数据保存失败")
+                return stock_data
+            except Exception as e:
+                logger.error(f"使用 API Key {api_key[-6:]} 获取数据时出错: {e}")
+                continue
+        return None
     
     def GET_STOCK_DATA_FROM_yahoo_finance(self, STOCK_CODE: str, START_DATE: str, END_DATE: str) -> pd.DataFrame:
         """获取指定股票在指定日期范围内的历史数据 by Yahoo Finance

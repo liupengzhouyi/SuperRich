@@ -43,7 +43,7 @@ class AlphaVantageFetcher(BaseFetcher):
             "2. high": "high",
             "3. low": "low",
             "4. close": "close",
-            "6. volume": "volume"
+            "5. volume": "volume"
         })
         df = df[["open", "high", "low", "close", "volume"]].sort_index()
 
@@ -99,7 +99,7 @@ class AlphaVantageFetcher(BaseFetcher):
                 "2. high": "high",
                 "3. low": "low",
                 "4. close": "close",
-                "6. volume": "volume"
+                "5. volume": "volume"
             })
             df.index = pd.to_datetime(df.index)
             df = df.sort_index()  # 时间升序
@@ -156,7 +156,7 @@ class AlphaVantageFetcher(BaseFetcher):
                 "2. high": "high",
                 "3. low": "low",
                 "4. close": "close",
-                "6. volume": "volume"
+                "5. volume": "volume"
             })
             df.index = pd.to_datetime(df.index)
             df = df.sort_index()  # 时间升序
