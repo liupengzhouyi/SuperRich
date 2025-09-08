@@ -244,7 +244,7 @@ class DataFactory:
             return None
     
     
-    def GET_STOCK_DATA_FROM_CACHE(self, STOCK_CODE: str, START_DATE: str, END_DATE: str) -> pd.DataFrame:
+    def GET_STOCK_DATA_FROM_CACHE_V0(self, STOCK_CODE: str, START_DATE: str, END_DATE: str) -> pd.DataFrame:
         
         log_info = f"从缓存获取 {STOCK_CODE} 在 {START_DATE} 到 {END_DATE} 之间的数据"
         logger.info(log_info)
@@ -264,6 +264,37 @@ class DataFactory:
         except Exception as e:
             logger.error(f"读取缓存文件时出错: {e}")
             return pd.DataFrame()
+        
+    def GET_STOCK_DATA_FROM_CACHE(self, STOCK_CODE: str, START_DATE: str, END_DATE: str) -> pd.DataFrame:
+        log_info = f"从缓存获取 {STOCK_CODE} 在 {START_DATE} 到 {END_DATE} 之间的数据"
+        logger.info(log_info)
+
+        cache_file_path = self._cache_file_path(STOCK_CODE, START_DATE, END_DATE)
+        cache_file_path = "data_cache/AAPL_1999-11-01_2025-08-28.csv"
+
+        if not os.path.exists(cache_file_path):
+            logger.error(f"缓存文件不存在: {cache_file_path}")
+            return pd.DataFrame()
+
+        try:
+            # ✅ 读取时直接解析日期并设为索引
+            df = pd.read_csv(cache_file_path, parse_dates=["date"], index_col="date")
+
+            if df.empty:
+                logger.warning(f"缓存文件为空: {cache_file_path}")
+                return pd.DataFrame()
+
+            # 确认索引是 DatetimeIndex
+            if not isinstance(df.index, pd.DatetimeIndex):
+                df.index = pd.to_datetime(df.index)
+
+            logger.info(f"成功从缓存文件读取数据: {cache_file_path}, 共 {len(df)} 行")
+            return df
+
+        except Exception as e:
+            logger.error(f"读取缓存文件时出错: {e}")
+            return pd.DataFrame()
+
     
     def GET_STOCK_DATA_FROM_alpha_vantage(self, STOCK_CODE: str, START_DATE: str, END_DATE: str) -> pd.DataFrame:
         """获取指定股票在指定日期范围内的历史数据 by Alpha Vantage
